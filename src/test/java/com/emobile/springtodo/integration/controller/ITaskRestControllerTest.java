@@ -7,6 +7,7 @@ import com.emobile.springtodo.integration.config.TestContainerConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,10 +18,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -37,18 +38,27 @@ class ITaskRestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+
     @Test
     @DirtiesContext
     @DisplayName("Should get task by ID and return 200 OK")
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldGetTaskByIdAndReturn200OK() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tasks/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Updated Title"))
-                .andExpect(jsonPath("$.description").value("Updated Description"))
-                .andExpect(jsonPath("$.status").value(Status.COMPLETED.name()));
-    }
+        String expectedJson = """
+                {
+                  "title": "Updated Title",
+                  "description": "Updated Description",
+                  "status": "COMPLETED"
+                }
+                """;
 
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tasks/1"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String actualJson = result.getResponse().getContentAsString();
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
+    }
 
     @Test
     @DirtiesContext
@@ -61,14 +71,23 @@ class ITaskRestControllerTest {
                 .status(Status.PENDING)
                 .build();
 
-        mockMvc.perform(post("/api/v1/tasks")
+        String expectedJson = """
+                {
+                  "id": 3,
+                  "title": "New Task",
+                  "description": "New Description",
+                  "status": "PENDING"
+                }
+                """;
+
+        MvcResult result = mockMvc.perform(post("/api/v1/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.title").value("New Task"))
-                .andExpect(jsonPath("$.description").value("New Description"))
-                .andExpect(jsonPath("$.status").value(Status.PENDING.name()));
+                .andReturn();
+
+        String actualJson = result.getResponse().getContentAsString();
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
 
     @Test
@@ -76,16 +95,32 @@ class ITaskRestControllerTest {
     @DirtiesContext
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldGetAllTasksWithPaginationAndReturn200OK() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tasks")
+        String expectedJson = """
+                [
+                  {
+                    "id": 1,
+                    "title": "Task 1",
+                    "description": "Description 1",
+                    "status": "PENDING"
+                  },
+                  {
+                    "id": 2,
+                    "title": "Task 2",
+                    "description": "Description 2",
+                    "status": "COMPLETED"
+                  }
+                ]
+                """;
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tasks")
                         .param("offset", "0")
                         .param("limit", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].title").value("Task 1"))
-                .andExpect(jsonPath("$[1].title").value("Task 2"));
-    }
+                .andReturn();
 
+        String actualJson = result.getResponse().getContentAsString();
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
+    }
 
     @Test
     @DisplayName("Should return 404 Not Found if task does not exist")
@@ -94,7 +129,15 @@ class ITaskRestControllerTest {
     void shouldReturn404NotFoundIfTaskDoesNotExist() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tasks/999"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Task with id 999 not found"));
+                .andExpect(result -> {
+                    String actualJson = result.getResponse().getContentAsString();
+                    String expectedJson = """
+                            {
+                              "message": "Task with id 999 not found"
+                            }
+                            """;
+                    JSONAssert.assertEquals(expectedJson, actualJson, false);
+                });
     }
 
     @Test
@@ -108,13 +151,22 @@ class ITaskRestControllerTest {
                 .status(Status.COMPLETED)
                 .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/tasks/1")
+        String expectedJson = """
+                {
+                  "title": "Updated Title",
+                  "description": "Updated Description",
+                  "status": "COMPLETED"
+                }
+                """;
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/tasks/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateTaskDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Updated Title"))
-                .andExpect(jsonPath("$.description").value("Updated Description"))
-                .andExpect(jsonPath("$.status").value(Status.COMPLETED.name()));
+                .andReturn();
+
+        String actualJson = result.getResponse().getContentAsString();
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
 
     @Test
