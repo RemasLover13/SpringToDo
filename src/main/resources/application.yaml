@@ -18,4 +18,11 @@ springdoc:
   swagger-ui:
     use-root-path: true
     disable-swagger-default-url: true
-
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"

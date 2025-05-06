@@ -96,9 +96,9 @@ class ITaskServiceTest {
         TaskDTO task = taskService.getTaskById(1L);
 
         Assertions.assertNotNull(task);
-        Assertions.assertEquals("Updated Title", task.getTitle());
-        Assertions.assertEquals("Updated Description", task.getDescription());
-        Assertions.assertEquals(Status.COMPLETED, task.getStatus());
+        Assertions.assertEquals("Task 1", task.getTitle());
+        Assertions.assertEquals("Description 1", task.getDescription());
+        Assertions.assertEquals(Status.PENDING, task.getStatus());
     }
 
     @Test

@@ -5,6 +5,8 @@ spring:
     driver-class-name: org.postgresql.Driver
   liquibase:
     enabled: false
+  cache:
+    type: none
 logging:
   level:
     org.springframework.jdbc.datasource.init: DEBUG

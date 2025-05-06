@@ -42,7 +42,6 @@ class ITaskDaoTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Should save a new task and generate ID")
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldSaveNewTaskAndGenerateId() {
@@ -61,7 +60,6 @@ class ITaskDaoTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Should find task by ID")
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldFindTaskById() {
@@ -72,7 +70,6 @@ class ITaskDaoTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Should throw TaskNotFoundException if task not found by ID")
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldThrowTaskNotFoundExceptionIfTaskNotFoundById() {
@@ -82,7 +79,6 @@ class ITaskDaoTest {
 
     @Test
     @DisplayName("Should delete task by ID")
-    @Transactional
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldDeleteTaskById() {
         taskDao.deleteById(1L);
@@ -92,7 +88,6 @@ class ITaskDaoTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Should update an existing task")
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldUpdateExistingTask() {
@@ -111,7 +106,6 @@ class ITaskDaoTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Should throw TaskNotFoundException if task not found during update")
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldThrowTaskNotFoundExceptionIfTaskNotFoundDuringUpdate() {
@@ -128,7 +122,6 @@ class ITaskDaoTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Should find paginated tasks")
     @Sql(scripts = {"/data/schema.sql", "/data/data.sql"})
     void shouldFindPaginatedTasks() {

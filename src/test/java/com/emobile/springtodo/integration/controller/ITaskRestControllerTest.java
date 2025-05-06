@@ -46,9 +46,9 @@ class ITaskRestControllerTest {
     void shouldGetTaskByIdAndReturn200OK() throws Exception {
         String expectedJson = """
                 {
-                  "title": "Updated Title",
-                  "description": "Updated Description",
-                  "status": "COMPLETED"
+                  "title": "Task 1",
+                  "description": "Description 1",
+                  "status": "PENDING"
                 }
                 """;
 
