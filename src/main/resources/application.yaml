@@ -1,0 +1,28 @@
+spring:
+  cache:
+    type: redis
+    cache-names: redis-cache
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  datasource:
+    url: jdbc:postgresql://localhost:5432/todolist_db
+    username: postgres
+    password: admin123
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: classpath:liquibase/db.changelog.yaml
+    enabled: true
+springdoc:
+  swagger-ui:
+    use-root-path: true
+    disable-swagger-default-url: true
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"

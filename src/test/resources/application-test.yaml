@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    username: postgres
+    password: admin123
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: false
+  cache:
+    type: none
+logging:
+  level:
+    org.springframework.jdbc.datasource.init: DEBUG
